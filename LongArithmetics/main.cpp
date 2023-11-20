@@ -6,8 +6,8 @@ int main() {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Generate two random BigIntegers
-    BigInteger a = BigInteger::GenerateRandomBigInteger(20);
-    BigInteger b = BigInteger::GenerateRandomBigInteger(10);
+    BigInteger a = BigInteger::GenerateRandomBigInteger(100);
+    BigInteger b = BigInteger::GenerateRandomBigInteger(90);
     BigInteger t("5");
 
     std::cout << "a = " << BigInteger::convertNumberToHexString(a.getNumber()) << std::endl;
@@ -16,16 +16,16 @@ int main() {
 
    
     // Perform arithmetic operations
-    BigInteger c = a + b;
-    BigInteger d = a - b;
-    BigInteger e = a * 0x10;
-    BigInteger f = a * b;
-    BigInteger g = a.square();
-    BigInteger h = a / b;
-    BigInteger j = a % b;
-    BigInteger k = a.pow(t); 
+    //BigInteger c = a + b;
+    //BigInteger d = a - b;
+    //BigInteger e = a * 0x10;
+    //BigInteger f = a * b;
+    //BigInteger g = a.square();
+    //BigInteger h = a / b;
+    //BigInteger j = a % b;
+    //BigInteger k = a.pow(t); 
    
-    const int iterations = 100;
+    const int iterations = 150;
 
     // Average time for addition
     long long totalTimeAddition = 0;
@@ -132,14 +132,14 @@ int main() {
     std::cout << "Average time for pow : " << averagetotalTimePow << " microseconds\n";
 
     // Output the results
-    std::cout << "a + b = " << BigInteger::convertNumberToHexString(c.getNumber()) << std::endl;
-    std::cout << "a - b = " << BigInteger::convertNumberToHexString(d.getNumber()) << std::endl;
-    std::cout << "a * 0x10 = " << BigInteger::convertNumberToHexString(e.getNumber()) << std::endl;
-    std::cout << "a * b = " << BigInteger::convertNumberToHexString(f.getNumber()) << std::endl;
-    std::cout << "a * a = " << BigInteger::convertNumberToHexString(g.getNumber()) << std::endl;
-    std::cout << "a / b = " << BigInteger::convertNumberToHexString(h.getNumber()) << std::endl;
-    std::cout << "a % b = " << BigInteger::convertNumberToHexString(j.getNumber()) << std::endl;
-    std::cout << "a ^ t = " << BigInteger::convertNumberToHexString(k.getNumber()) << std::endl;
+    //std::cout << "a + b = " << BigInteger::convertNumberToHexString(c.getNumber()) << std::endl;
+    //std::cout << "a - b = " << BigInteger::convertNumberToHexString(d.getNumber()) << std::endl;
+    //std::cout << "a * 0x10 = " << BigInteger::convertNumberToHexString(e.getNumber()) << std::endl;
+    //std::cout << "a * b = " << BigInteger::convertNumberToHexString(f.getNumber()) << std::endl;
+    //std::cout << "a * a = " << BigInteger::convertNumberToHexString(g.getNumber()) << std::endl;
+    //std::cout << "a / b = " << BigInteger::convertNumberToHexString(h.getNumber()) << std::endl;
+    //std::cout << "a % b = " << BigInteger::convertNumberToHexString(j.getNumber()) << std::endl;
+    //std::cout << "a ^ t = " << BigInteger::convertNumberToHexString(k.getNumber()) << std::endl;
 
     BigInteger zeroBigInteger;
     assert(BigInteger::convertNumberToHexString(zeroBigInteger.getNumber()) == "0");
@@ -186,11 +186,11 @@ int main() {
     BigInteger First("7A72D");
     BigInteger Second("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
     BigInteger Third("40A4E");
-    BigInteger left_side = (a + b) * c;
-    BigInteger right_side = c * (a + b);
-    BigInteger a_times_c = a * c;
-    BigInteger b_times_c = b * c;
-    BigInteger sum_ab = a + b;
+    BigInteger left_side = (First + Second) * Third;
+    BigInteger right_side = Third * (First + Second);
+    BigInteger a_times_c = First * Third;
+    BigInteger b_times_c = Second * Third;
+    BigInteger sum_ab = First + Second;
     BigInteger sum_ab_times_c = a_times_c + b_times_c;
 
     assert(left_side == right_side);
