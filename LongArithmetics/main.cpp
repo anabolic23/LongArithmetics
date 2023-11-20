@@ -3,12 +3,11 @@
 #include <chrono>
 
 int main() {
-    // Create two BigIntegers
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Generate two random BigIntegers
-    BigInteger a = BigInteger::GenerateRandomBigInteger(10);
-    BigInteger b = BigInteger::GenerateRandomBigInteger(5);
+    BigInteger a = BigInteger::GenerateRandomBigInteger(20);
+    BigInteger b = BigInteger::GenerateRandomBigInteger(10);
     BigInteger t("5");
 
     std::cout << "a = " << BigInteger::convertNumberToHexString(a.getNumber()) << std::endl;
@@ -183,7 +182,36 @@ int main() {
     BigInteger powerResult = powFirst.pow(powSecond);
     assert(BigInteger::convertNumberToHexString(powerResult.getNumber()) == "668C546E175F94CDEB7074D8EF27F05FC99B36EDE31C93B94ACE3632B904FBBF48A8ADBD23153F7B586E37248A13CE0C045BC41B9C92DA50D7628DEC14755CDBAD15F92E630CC754F0C94EF8842C782DD0F4CD3E97D120D1F78B19183B99B9D876005D86DF7D81295FA6AC80CF0A959935C49CE403DC849979497CB5EDCA8DC06EA161C5B29FE7D9BC4372CEBEAA67E803424BEF27072CA33A05ABC98F8E349EC38CE08F82954F5725AC4B8645C168EB453FA948CD22E75E693D3B6CDBFDC477C734BAE1730C495");
 
+    //Some another tests
+    BigInteger First("7A72D");
+    BigInteger Second("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
+    BigInteger Third("40A4E");
+    BigInteger left_side = (a + b) * c;
+    BigInteger right_side = c * (a + b);
+    BigInteger a_times_c = a * c;
+    BigInteger b_times_c = b * c;
+    BigInteger sum_ab = a + b;
+    BigInteger sum_ab_times_c = a_times_c + b_times_c;
+
+    assert(left_side == right_side);
+    assert(left_side == sum_ab_times_c);
+    //std::cout << "(a + b) * c = c * (a + b) = a * c + b * c is VALID" << std::endl;
+
+
+    int n = 150; // n > 100
+
+    BigInteger n_times_a = First * n;
+
+    BigInteger sum_a;
+    for (int i = 0; i < n; ++i) {
+        sum_a = sum_a + First;
+    }
+
+    assert(n_times_a == sum_a);
+    //std::cout << "n * a = a + a + a + ... + a (n times) where n > 100 is VALID" << std::endl;
+
     std::cout << "All tests passed!" << std::endl;
 
     return 0;
+
 }

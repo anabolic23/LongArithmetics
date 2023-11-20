@@ -78,7 +78,6 @@ std::string BigInteger::convertNumberToHexString(uint32_t* array, bool isSmall) 
         output = output.substr(firstNonZero);
     }
     else {
-        // Handle case when the string is empty or all zeros
         output = "0";
     }
     
@@ -324,7 +323,7 @@ BigInteger BigInteger::operator%(const BigInteger& other) const {
 
     BigInteger A = *this;
     BigInteger B = other;
-    BigInteger Remainder; // Remainder
+    BigInteger Remainder; 
     int k = B.BitLength();
     Remainder = A;
 
