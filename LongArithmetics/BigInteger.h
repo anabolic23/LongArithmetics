@@ -4,6 +4,9 @@
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
+#include <random>
+#include <bitset>
+#include <cassert>
 
 class BigInteger {
 private:
@@ -20,10 +23,12 @@ public:
     // Constructor that takes an integer in hexadecimal format
     BigInteger(const std::string& hexValue);
 
-    static uint32_t HexSymbolIntoDigit(char c);
-    static char DigitIntoHexSymbol(uint32_t i, bool isSmall = false);
-    static uint32_t* HexStringIntoNumber(const std::string& str);
-    static std::string NumberIntoHexString(uint32_t* array, bool isSmall = false);
+    // Convert functions
+    static uint32_t convertHexSymboToDigit(char c);
+    static char convertDigitToHexSymbol(uint32_t i, bool isSmall = false);
+    static uint32_t* convertHexStringToNumber(const std::string& str);
+    static std::string convertNumberToHexString(uint32_t* array, bool isSmall = false);
+    std::string convertIntoBinaryString(const BigInteger& other) const;
 
     // Addition and subtraction operations
     BigInteger operator+(const BigInteger& other) const;
@@ -42,7 +47,7 @@ public:
     BigInteger operator%(const BigInteger& other) const;
 
     // Exponentiation operation
-    BigInteger pow(const BigInteger& other) const;
+    BigInteger pow(const BigInteger& exponent) const;
 
     BigInteger operator >> (int b) const;
     BigInteger operator << (int b) const;
@@ -54,4 +59,8 @@ public:
     bool operator>(const BigInteger& other) const;
     bool operator<=(const BigInteger& other) const;
     bool operator>=(const BigInteger& other) const;
+
+    // Generator
+    static BigInteger GenerateRandomBigInteger(int size);
+    
 };

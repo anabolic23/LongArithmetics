@@ -1,37 +1,189 @@
 #include <iostream>
 #include "BigInteger.h"
+#include <chrono>
 
 int main() {
     // Create two BigIntegers
-    BigInteger a("a9694988354c96530b1a58f8ad59569af0d402ab53d275ddb5cb393f47c6b098977f181ab889d3c5ceb96b9f3c0702c947856481d654c691d0f736fa2ef7aa0fbec62224e467f741e53edf8c8fe82c13fb90ac66eee37a975f16dd9faafd213c538711bbea34fbfd8b4330e17409d5c35313743d5dea5a82d34d99a10ac9223b"); // Initialize with a hexadecimal string
-    BigInteger b("cbe75e23d145c3dc78d76739b63d337cc33268e08ce4ea7319c38b7d057b1747d59010759f3b015858dc5a9d05ddbbd3ef41a368ba1ca6d8a6d967f2fed6b7033e7f56d46beae7c259cce870e0879f49849c956b6b6810be90d0c50c54daaef41b2b1c6e3c7b2ed35da549a7c95fd551841ea90e4196e8272b42ea3dba7cdcef");   // Initialize with a hexadecimal string
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+    // Generate two random BigIntegers
+    BigInteger a = BigInteger::GenerateRandomBigInteger(10);
+    BigInteger b = BigInteger::GenerateRandomBigInteger(5);
     BigInteger t("5");
 
-    std::cout << "a = " << BigInteger::NumberIntoHexString(a.getNumber()) << std::endl;
-    std::cout << "b = " << BigInteger::NumberIntoHexString(b.getNumber()) << std::endl;
-    std::cout << "t = " << BigInteger::NumberIntoHexString(t.getNumber()) << std::endl;
+    std::cout << "a = " << BigInteger::convertNumberToHexString(a.getNumber()) << std::endl;
+    std::cout << "b = " << BigInteger::convertNumberToHexString(b.getNumber()) << std::endl;
+    std::cout << "t = " << BigInteger::convertNumberToHexString(t.getNumber()) << std::endl;
 
+   
     // Perform arithmetic operations
     BigInteger c = a + b;
-    BigInteger d = b - a;
+    BigInteger d = a - b;
     BigInteger e = a * 0x10;
     BigInteger f = a * b;
     BigInteger g = a.square();
     BigInteger h = a / b;
-    BigInteger i = a % b;
+    BigInteger j = a % b;
     BigInteger k = a.pow(t); 
    
+    const int iterations = 100;
+
+    // Average time for addition
+    long long totalTimeAddition = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger c = a + b;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeAddition += duration.count();
+    }
+    double averageTimeAddition = static_cast<double>(totalTimeAddition) / iterations;
+    std::cout << "Average time for addition: " << averageTimeAddition << " microseconds\n";
+
+    // Average time for subtraction
+    long long totalTimeSubtraction = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger d = a - b;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeSubtraction += duration.count();
+    }
+    double averageTimeSubtraction = static_cast<double>(totalTimeSubtraction) / iterations;
+    std::cout << "Average time for subtraction: " << averageTimeSubtraction << " microseconds\n";
+
+    // Average time for multiplication (constant)
+    long long totalTimeMultiplication = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger e = a * 0x10;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeMultiplication += duration.count();
+    }
+    double averageTimeMultiplication = static_cast<double>(totalTimeMultiplication) / iterations;
+    std::cout << "Average time for multiplication (constant): " << averageTimeMultiplication << " microseconds\n";
+
+    // Average time for big multiplication 
+    long long totalTimeBigMultiplication = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger f = a * b;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeBigMultiplication += duration.count();
+    }
+    double averageTimeBigMultiplication = static_cast<double>(totalTimeBigMultiplication) / iterations;
+    std::cout << "Average time for big multiplication : " << averageTimeBigMultiplication << " microseconds\n";
+
+    // Average time for square 
+    long long totalTimeSquare = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger g = a.square();
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeSquare += duration.count();
+    }
+    double averagetotalTimeSquare = static_cast<double>(totalTimeSquare) / iterations;
+    std::cout << "Average time for square : " << averagetotalTimeSquare << " microseconds\n";
+
+    // Average time for division
+    long long totalTimeDivision = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger h = a / b;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeDivision += duration.count();
+    }
+    double averagetotalTimeDivision = static_cast<double>(totalTimeDivision) / iterations;
+    std::cout << "Average time for division : " << averagetotalTimeDivision << " microseconds\n";
+
+    // Average time for mod
+    long long totalTimeMod = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger j = a % b;
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimeMod += duration.count();
+    }
+    double averagetotalTimeMod = static_cast<double>(totalTimeMod) / iterations;
+    std::cout << "Average time for mod : " << averagetotalTimeMod << " microseconds\n";
+
+    // Average time for pow
+    long long totalTimePow = 0;
+    for (int i = 0; i < iterations; ++i) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+        BigInteger k = a.pow(t);
+        auto endTime = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+        totalTimePow += duration.count();
+    }
+    double averagetotalTimePow = static_cast<double>(totalTimePow) / iterations;
+    std::cout << "Average time for pow : " << averagetotalTimePow << " microseconds\n";
 
     // Output the results
-    std::cout << "a + b = " << BigInteger::NumberIntoHexString(c.getNumber()) << std::endl;
-    std::cout << "b - a = " << BigInteger::NumberIntoHexString(d.getNumber()) << std::endl;
-    std::cout << "a * 0x10 = " << BigInteger::NumberIntoHexString(e.getNumber()) << std::endl;
-    std::cout << "a * b = " << BigInteger::NumberIntoHexString(f.getNumber()) << std::endl;
-    std::cout << "a * a = " << BigInteger::NumberIntoHexString(g.getNumber()) << std::endl;
-    std::cout << "a / b = " << BigInteger::NumberIntoHexString(h.getNumber()) << std::endl;
-    std::cout << "a % b = " << BigInteger::NumberIntoHexString(i.getNumber()) << std::endl;
-    std::cout << "a ^ t = " << BigInteger::NumberIntoHexString(k.getNumber()) << std::endl;
+    std::cout << "a + b = " << BigInteger::convertNumberToHexString(c.getNumber()) << std::endl;
+    std::cout << "a - b = " << BigInteger::convertNumberToHexString(d.getNumber()) << std::endl;
+    std::cout << "a * 0x10 = " << BigInteger::convertNumberToHexString(e.getNumber()) << std::endl;
+    std::cout << "a * b = " << BigInteger::convertNumberToHexString(f.getNumber()) << std::endl;
+    std::cout << "a * a = " << BigInteger::convertNumberToHexString(g.getNumber()) << std::endl;
+    std::cout << "a / b = " << BigInteger::convertNumberToHexString(h.getNumber()) << std::endl;
+    std::cout << "a % b = " << BigInteger::convertNumberToHexString(j.getNumber()) << std::endl;
+    std::cout << "a ^ t = " << BigInteger::convertNumberToHexString(k.getNumber()) << std::endl;
 
+    BigInteger zeroBigInteger;
+    assert(BigInteger::convertNumberToHexString(zeroBigInteger.getNumber()) == "0");
+
+    // Test constructor with hexadecimal string
+    BigInteger hexBigInteger("FF");
+    assert(BigInteger::convertNumberToHexString(hexBigInteger.getNumber()) == "FF");
+
+    // Test addition operation
+    BigInteger firstOperand("7A72D270E386A2C8309CDCD02C144338721DFB56711A6255578A4F8F7A3C1AC11D40A4E0B0CB3AE5");
+    BigInteger secondOperand("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
+    BigInteger additionResult = firstOperand + secondOperand;
+    assert(BigInteger::convertNumberToHexString(additionResult.getNumber()) == "7A72D270E386A2C8309CDCD02C144338721DFB570D532EED6AC7B545A51B0D693D324898F310A2D6");
+
+    // Test subtraction operation
+    BigInteger subtractionResult = firstOperand - secondOperand;
+    assert(BigInteger::convertNumberToHexString(subtractionResult.getNumber()) == "7A72D270E386A2C8309CDCD02C144338721DFB55D4E195BD444CE9D94F5D2818FD4F01286E85D2F4");
+
+    // Test multiplication operation
+    BigInteger mulFirst("7A72D270E386A2C8309CDCD02C144338721DFB56711A6255578A4F8F7A3C1AC11D40A4E0B0CB3AE5");
+    BigInteger mulSecond("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
+    BigInteger multiplicationResult = mulFirst * mulSecond;
+    assert(BigInteger::convertNumberToHexString(multiplicationResult.getNumber()) == "4AB92337106A9C9CF0053BD283889DE78CDAA358B5CF724D58676A1DBEDFC22B5D1AF8B270E6FF986346A9E13D6719E1A4F22D4C8F7CCE361DBD9495");
+
+    // Test division operation
+    BigInteger divFirst("7A72D270E386A2C8309CDCD02C144338721DFB56711A6255578A4F8F7A3C1AC11D40A4E0B0CB3AE5");
+    BigInteger divSecond("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
+    BigInteger divisionResult = divFirst / divSecond;
+    assert(BigInteger::convertNumberToHexString(divisionResult.getNumber()) == "C8A7E166BC2FE58FF1ED1263A551980BF5526079");
+
+    // Test modulus operation
+    BigInteger modFirst("7A72D270E386A2C8309CDCD02C144338721DFB56711A6255578A4F8F7A3C1AC11D40A4E0B0CB3AE5");
+    BigInteger modSecond("9C38CC98133D65B62ADEF2A81FF1A3B8424567F1");
+    BigInteger modulusResult = modFirst % modSecond;
+    assert(BigInteger::convertNumberToHexString(modulusResult.getNumber()) == "4FF5939B66A21DECF59197CE573FF3DF66D0B9FC");
+
+    // Test power operation
+    BigInteger powFirst("7A72D270E386A2C8309CDCD02C144338721DFB56711A6255578A4F8F7A3C1AC11D40A4E0B0CB3AE5");
+    BigInteger powSecond("5");
+    BigInteger powerResult = powFirst.pow(powSecond);
+    assert(BigInteger::convertNumberToHexString(powerResult.getNumber()) == "668C546E175F94CDEB7074D8EF27F05FC99B36EDE31C93B94ACE3632B904FBBF48A8ADBD23153F7B586E37248A13CE0C045BC41B9C92DA50D7628DEC14755CDBAD15F92E630CC754F0C94EF8842C782DD0F4CD3E97D120D1F78B19183B99B9D876005D86DF7D81295FA6AC80CF0A959935C49CE403DC849979497CB5EDCA8DC06EA161C5B29FE7D9BC4372CEBEAA67E803424BEF27072CA33A05ABC98F8E349EC38CE08F82954F5725AC4B8645C168EB453FA948CD22E75E693D3B6CDBFDC477C734BAE1730C495");
+
+    std::cout << "All tests passed!" << std::endl;
 
     return 0;
 }

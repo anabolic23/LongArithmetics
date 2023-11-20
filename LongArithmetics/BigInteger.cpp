@@ -7,13 +7,13 @@ BigInteger::BigInteger() {
 }
 
 BigInteger::BigInteger(const std::string& hexValue) {
-    uint32_t* hexArray = HexStringIntoNumber(hexValue);
+    uint32_t* hexArray = convertHexStringToNumber(hexValue);
     for (int i = 0; i < SIZE; i++) {
         number[i] = hexArray[i];
     }
 }
 
-uint32_t BigInteger::HexSymbolIntoDigit(char c) {
+uint32_t BigInteger::convertHexSymboToDigit(char c) {
     if (c >= '0' && c <= '9')
         return static_cast<uint32_t>(c - '0');
     else if (c >= 'a' && c <= 'f')
@@ -24,7 +24,7 @@ uint32_t BigInteger::HexSymbolIntoDigit(char c) {
     return 0;
 }
 
-char BigInteger::DigitIntoHexSymbol(uint32_t i, bool isSmall) {
+char BigInteger::convertDigitToHexSymbol(uint32_t i, bool isSmall) {
     if (i >= 0 && i < 10) {
         return static_cast<char>('0' + i);
     }
@@ -39,7 +39,7 @@ char BigInteger::DigitIntoHexSymbol(uint32_t i, bool isSmall) {
     throw std::invalid_argument("Incorrect number");
 }
 
-uint32_t* BigInteger::HexStringIntoNumber(const std::string& str) {
+uint32_t* BigInteger::convertHexStringToNumber(const std::string& str) {
     uint32_t* array = new uint32_t[SIZE](); // Initialize with zeros
     std::string strReverse(str.rbegin(), str.rend());
     int cell = -1;
@@ -49,13 +49,13 @@ uint32_t* BigInteger::HexStringIntoNumber(const std::string& str) {
             cell++;
         }
         uint32_t powerOfTwo = static_cast<uint32_t>(1 << (4 * j));
-        uint32_t hexSymbol = HexSymbolIntoDigit(strReverse[i]);
+        uint32_t hexSymbol = convertHexSymboToDigit(strReverse[i]);
         array[cell] += hexSymbol * powerOfTwo;
     }
     return array;
 }
 
-std::string BigInteger::NumberIntoHexString(uint32_t* array, bool isSmall) {
+std::string BigInteger::convertNumberToHexString(uint32_t* array, bool isSmall) {
     std::string output;
     uint32_t* reverseArray = new uint32_t[SIZE];
     for (int i = SIZE - 1; i >= 0; i--) {
@@ -68,7 +68,7 @@ std::string BigInteger::NumberIntoHexString(uint32_t* array, bool isSmall) {
             uint32_t powerOfTwo = static_cast<uint32_t>(1 << (4 * j));
             uint32_t temp = reverseArray[i] / powerOfTwo;
             temp = temp % 16;
-            str += DigitIntoHexSymbol(temp, isSmall);
+            str += convertDigitToHexSymbol(temp, isSmall);
         }
         std::reverse(str.begin(), str.end());
         output += str;
@@ -235,34 +235,54 @@ int BigInteger::BitLength() const {
 }
 
 BigInteger BigInteger::LongShiftBitsToHigh(int bits) const {
-    if (bits < 0) {
-        throw std::invalid_argument("Shift bits must be non-negative.");
+
+    BigInteger result("0");
+
+    if (bits <= 0) {
+        return *this;
+    }
+    if (bits >= SIZE * 32) {
+        return result;
     }
 
-    BigInteger result = *this;
-    int wordShift = bits / 32;
-    bits %= 32;
+    int numBlocks = bits / 32; // Calculate the number of 32-bit blocks to shift
+    int remainingBits = bits % 32; // Calculate the remaining bits to shift within a block
 
-    // Shift words to the left
-    for (int i = SIZE - 1; i >= wordShift; i--) {
-        result.number[i] = result.number[i - wordShift];
-    }
-    for (int i = 0; i < wordShift; i++) {
-        result.number[i] = 0;
-    }
+    uint32_t carry = 0;
 
-    // Shift bits within the words
-    if (bits > 0) {
-        int carry = 0;
-        for (int i = SIZE - 1; i >= 0; i--) {
-            uint32_t originalWord = result.number[i];
-            result.number[i] = (originalWord << bits) | carry;
-            carry = originalWord >> (32 - bits);
+    if (remainingBits != 0) {
+
+        // Perform shifting for the blocks
+        for (int i = 0; i < SIZE; i++) {
+            result.number[i] = (this->number[i] << remainingBits) + carry;
+            carry = (this->number[i] >> (32 - remainingBits));
+        }
+
+        // Shift the blocks
+        for (int i = SIZE - 1; i >= numBlocks; i--) {
+            result.number[i] = result.number[i - numBlocks];
+        }
+
+        // Fill lower blocks with zeros
+        for (int i = 0; i < numBlocks; i++) {
+            result.number[i] = 0;
+        }
+    }
+    else {
+        // Shift entire blocks of 32 bits to the left
+        for (int i = SIZE - 1; i >= numBlocks; i--) {
+            result.number[i] = this->number[i - numBlocks];
+        }
+
+        // Fill lower blocks with zeros
+        for (int i = 0; i < numBlocks; i++) {
+            result.number[i] = 0;
         }
     }
 
     return result;
 }
+
 
 BigInteger BigInteger::operator/(const BigInteger& other) const {
     if (other == BigInteger("0")) {
@@ -275,26 +295,26 @@ BigInteger BigInteger::operator/(const BigInteger& other) const {
 
     BigInteger A = *this;
     BigInteger B = other;
-    BigInteger Q; // Quotient
-    BigInteger R; // Remainder
+    BigInteger Quotient; 
+    BigInteger Remainder;
     int k = B.BitLength();
-    R = A;
-    Q = BigInteger("0");
+    Remainder = A;
+    Quotient = BigInteger("0");
 
-    while (R >= B) {
-        int t = R.BitLength();
+    while (Remainder >= B) {
+        int t = Remainder.BitLength();
         BigInteger C = B.LongShiftBitsToHigh(t - k);
 
-        if (R < C) {
+        if (Remainder < C) {
             t = t - 1;
             C = B.LongShiftBitsToHigh(t - k);
         }
 
-        R = R - C;
-        Q = Q + BigInteger("1").LongShiftBitsToHigh(t - k);
+        Remainder = Remainder - C;
+        Quotient = Quotient + BigInteger("1").LongShiftBitsToHigh(t - k);
     }
 
-    return Q;
+    return Quotient;
 }
 
 BigInteger BigInteger::operator%(const BigInteger& other) const {
@@ -304,43 +324,76 @@ BigInteger BigInteger::operator%(const BigInteger& other) const {
 
     BigInteger A = *this;
     BigInteger B = other;
-    BigInteger R; // Remainder
+    BigInteger Remainder; // Remainder
     int k = B.BitLength();
-    R = A;
+    Remainder = A;
 
-    while (R >= B) {
-        int t = R.BitLength();
+    while (Remainder >= B) {
+        int t = Remainder.BitLength();
         BigInteger C = B.LongShiftBitsToHigh(t - k);
 
-        if (R < C) {
+        if (Remainder < C) {
             t = t - 1;
             C = B.LongShiftBitsToHigh(t - k);
         }
 
-        R = R - C;
+        Remainder = Remainder - C;
     }
 
-    return R;
+    return Remainder;
 }
 
 BigInteger BigInteger::pow(const BigInteger& other) const {
     BigInteger base = *this;
-    BigInteger exponent = other;
+    std::string exponent = convertIntoBinaryString(other);
     BigInteger result("1");
 
-    while (exponent != BigInteger("0")) {
-        if ((exponent % BigInteger("2")) == BigInteger("1")) {
+    for (int i = exponent.size() - 1; i >= 0; i--) {
+        if (exponent[i] == '1')
             result = result * base;
-        }
-        base = base.square();
-        exponent = exponent / BigInteger("2");
-    }
 
+        if (i > 0)
+            base = base.square();
+    }
     return result;
 }
 
+std::string BigInteger::convertIntoBinaryString(const BigInteger& other) const {
+    std::string binaryString;
 
+    for (int i = SIZE - 1; i >= 0; i--) {
+        uint32_t currentNumber = other.number[i];
 
+        for (int j = 31; j >= 0; j--) {
+            uint32_t bit = (currentNumber >> j) & 1;
+            binaryString += std::to_string(bit);
+        }
+    }
 
+    binaryString.erase(0, binaryString.find_first_not_of('0'));
 
+  
+    if (binaryString.empty()) {
+        return "0";
+    }
+
+    return binaryString;
+}
+
+BigInteger BigInteger::GenerateRandomBigInteger(int size = SIZE) {
+    BigInteger randBigInt;
+    std::random_device                  rand_dev;
+    std::mt19937                        generator(rand_dev());
+    std::uniform_int_distribution<uint32_t>    distr(0, UINT_MAX);
+   
+    for (int i = 0; i < size; ++i) {
+        // Generate a random 32-bit unsigned integer
+        uint32_t randomValue = static_cast<uint32_t>(distr(generator));
+
+        // Assign the random value to the corresponding digit in the BigInteger
+        randBigInt.number[i] = randomValue;
+    }
+
+    return randBigInt;
+}
 
