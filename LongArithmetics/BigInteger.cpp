@@ -80,7 +80,7 @@ std::string BigInteger::convertNumberToHexString(uint32_t* array, bool isSmall) 
     else {
         output = "0";
     }
-    
+
     return output;
 }
 
@@ -294,7 +294,7 @@ BigInteger BigInteger::operator/(const BigInteger& other) const {
 
     BigInteger A = *this;
     BigInteger B = other;
-    BigInteger Quotient; 
+    BigInteger Quotient;
     BigInteger Remainder;
     int k = B.BitLength();
     Remainder = A;
@@ -323,7 +323,7 @@ BigInteger BigInteger::operator%(const BigInteger& other) const {
 
     BigInteger A = *this;
     BigInteger B = other;
-    BigInteger Remainder; 
+    BigInteger Remainder;
     int k = B.BitLength();
     Remainder = A;
 
@@ -371,7 +371,7 @@ std::string BigInteger::convertIntoBinaryString(const BigInteger& other) const {
 
     binaryString.erase(0, binaryString.find_first_not_of('0'));
 
-  
+
     if (binaryString.empty()) {
         return "0";
     }
@@ -384,7 +384,7 @@ BigInteger BigInteger::GenerateRandomBigInteger(int size = SIZE) {
     std::random_device                  rand_dev;
     std::mt19937                        generator(rand_dev());
     std::uniform_int_distribution<uint32_t>    distr(0, UINT_MAX);
-   
+
     for (int i = 0; i < size; ++i) {
         // Generate a random 32-bit unsigned integer
         uint32_t randomValue = static_cast<uint32_t>(distr(generator));
@@ -396,3 +396,179 @@ BigInteger BigInteger::GenerateRandomBigInteger(int size = SIZE) {
     return randBigInt;
 }
 
+BigInteger BigInteger::shiftRight() {
+    int carry = 0;
+    BigInteger result("0");
+    for (int i = SIZE - 1; i >= 0; --i) {
+        result.number[i] = (this->number[i] >> 1) + (carry << 31);
+        carry = this->number[i] & 1;
+    }
+    return result;
+}
+
+bool BigInteger::lastHexSymbolDivisibleByTwo() const {
+    return (number[0] % 2 == 0);
+}
+
+BigInteger BigInteger::gcd(const BigInteger& a, const BigInteger& b) {
+    if (b == BigInteger("0")) {
+        return a;
+    }
+
+    BigInteger tempA = a;
+    BigInteger tempB = b;
+    BigInteger d("1");
+
+    // Check for division by 2 using the last hex symbol
+    while (tempA.lastHexSymbolDivisibleByTwo()) {
+        if (tempB.lastHexSymbolDivisibleByTwo()) {
+            tempA = tempA.shiftRight();
+            tempB = tempB.shiftRight();
+            d = d * BigInteger("2");
+        }
+        else {
+            break;
+        }
+    }
+
+    // Continue checking for division by 2 for tempA
+    while (tempA.lastHexSymbolDivisibleByTwo()) {
+        tempA = tempA.shiftRight();
+    }
+
+    // Euclidean algorithm to find GCD
+    while (tempB != BigInteger("0")) {
+        while (tempB.lastHexSymbolDivisibleByTwo()) {
+            tempB = tempB.shiftRight();
+        }
+        BigInteger temp;
+        if (tempA < tempB) {
+            temp = tempA;
+        }
+        else {
+            temp = tempB;
+        }
+
+        if (tempA < tempB) {
+            tempB = tempB - tempA;
+        }
+        else {
+            tempB = tempA - tempB;
+        }
+        tempA = temp;
+    }
+
+    d = d * tempA;
+    return d;
+}
+
+BigInteger BigInteger::lcm(const BigInteger& a, const BigInteger& b) {
+    BigInteger tempA = a;
+    BigInteger tempB = b;
+
+    return (tempA * tempB) / gcd(tempA, tempB);
+}
+
+BigInteger BigInteger::PreCalculation(const BigInteger& n) {
+    int length = n.DigitLength();
+    BigInteger Beta("1");
+    Beta = Beta << (2 * length);
+    BigInteger temp = Beta / n;
+    return temp;
+}
+
+BigInteger BigInteger::BarrettReduction(const BigInteger& x, const BigInteger& n, const BigInteger& m) {
+    int k = n.DigitLength();
+    BigInteger tempX = x;
+    BigInteger tempN = n;
+    BigInteger tempM = m;
+
+    if (tempX < tempN) {
+        return tempX;
+    }
+
+    BigInteger Q = tempX >> (k - 1);
+    Q = Q * tempM;
+    Q = Q >> (k + 1);
+
+    BigInteger R = tempX - (Q * tempN);
+    while (R >= tempN) {
+        R = R - tempN;
+    }
+    return R;
+}
+
+int BigInteger::DigitLength() const {
+    int length = SIZE;
+    while (number[length - 1] == 0)
+    {
+        length--;
+        if (length == 0)
+        {
+            break;
+        }
+    }
+    return length;
+}
+
+BigInteger BigInteger::AdditionMod(const BigInteger& a, const BigInteger& b, const BigInteger& m) {
+
+    BigInteger result("0");
+    result = a + b;
+
+    if (result >= m) {
+        result = BarrettReduction(result, m, PreCalculation(m));
+    }
+
+    return result;
+}
+
+BigInteger BigInteger::SubtractionMod(const BigInteger& a, const BigInteger& b, const BigInteger& m) {
+
+    BigInteger result("0");
+
+    if (a >= b) {
+        result = a - b;
+    }
+    else {
+        result = a + (m - b);
+    }
+
+    if (result >= m) {
+        result = BarrettReduction(result, m, PreCalculation(m));
+    }
+
+    return result;
+}
+
+BigInteger BigInteger::MultiplicationMod(const BigInteger& a, const BigInteger& b, const BigInteger& m) {
+    BigInteger result("0");
+
+    result = a * b;
+
+    if (result >= m) {
+        result = BarrettReduction(result, m, PreCalculation(m));
+    }
+
+    return result;
+}
+
+BigInteger BigInteger::SquareMod(const BigInteger& a, const BigInteger& m) {
+    return BigInteger::MultiplicationMod(a, a, m);
+}
+
+BigInteger BigInteger::LongModPowerBarrett(const BigInteger& a, const BigInteger& b, const BigInteger& n) {
+    BigInteger result("1");
+    BigInteger base = a % n;
+    BigInteger Mu = PreCalculation(n);
+
+    std::string binaryExp = b.convertIntoBinaryString(b);
+
+    for (int i = binaryExp.length() - 1; i >= 0; --i) {
+        if (binaryExp[i] == '1') {
+            result = BarrettReduction(result * base, n, Mu);
+        }
+        base = BarrettReduction(base.square(), n, Mu);
+    }
+    return result;
+}

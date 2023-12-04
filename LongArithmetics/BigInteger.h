@@ -10,7 +10,7 @@
 
 class BigInteger {
 private:
-    static const int SIZE = 256;
+    static const int SIZE = 128;
     uint32_t number[SIZE];
 
 public:
@@ -62,5 +62,22 @@ public:
 
     // Generator
     static BigInteger GenerateRandomBigInteger(int size);
-    
+
+    static BigInteger gcd(const BigInteger& a, const BigInteger& b);
+
+    static BigInteger lcm(const BigInteger& a, const BigInteger& b);
+
+    BigInteger shiftRight(); // Function to perform right shift
+    bool lastHexSymbolDivisibleByTwo() const; // Function to check divisibility by 2
+
+    static BigInteger PreCalculation(const BigInteger& n);
+    static BigInteger BarrettReduction(const BigInteger& x, const BigInteger& n, const BigInteger& m);
+    int DigitLength() const;
+
+    static BigInteger AdditionMod(const BigInteger& a, const BigInteger& b, const BigInteger& m);
+    static BigInteger SubtractionMod(const BigInteger& a, const BigInteger& b, const BigInteger& m);
+    static BigInteger MultiplicationMod(const BigInteger& a, const BigInteger& b, const BigInteger& m);
+    static BigInteger SquareMod(const BigInteger& a, const BigInteger& m);
+    static BigInteger LongModPowerBarrett(const BigInteger& a, const BigInteger& b, const BigInteger& n);
+
 };
